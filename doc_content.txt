@@ -1,0 +1,40 @@
+ផែនការAI Khmer <=>English Translator + Grammar Fixer
+គំនិតសំខាន់
+Translate KH <=> EN: Users can accurately translate text between Khmer and English.
+Fix Grammar: AI automatically detects and corrects grammar or spelling mistakes.
+Improve Formal Writing: AI upgrades vocabulary and sentence structure for professional contexts (like emails or reports).
+Tone Adjustment: Users can switch the mood of the text (e.g., from Friendly to Formal).
+ដំណើរការ Workflow
+បញ្ចូល (Input): អ្នកប្រើប្រាស់វាយអត្ថបទ, paste text, ឬសរសេរប្រយោគដែលចង់បកប្រែ ឬកែសម្រួល។
+ដំណើរការ AI (Process): AI វិភាគអត្ថបទ → បកប្រែ (Translate) / កែវេយ្យាករណ៍ (Fix) / ប្ដូរសម្លេង (Adjust Tone)។
+បង្ហាញ (Output): បង្ហាញអត្ថបទដែលបានកែសម្រួលរួច ព្រមទាំងការពន្យល់ពីកំហុសវេយ្យាករណ៍ដែលបានកែតម្រូវ។
+រក្សាទុក (Save): Save history សម្រាប់មើលវិញពេលក្រោយ.
+UI/UX Structure(Web App)
+Main Layout:
+Sidebar (Menu) 
+Main Workspace (Split screen: Input on left, Output on right)
+Input Box (bottom or main container) 
+Sidebar Menu:
+Translate
+Fix Grammar
+Improve Writing
+Tone Adjustment
+History
+Workspace Interface:
+Input field (text) 
+Dropdown menus for options (Target Language, Desired Tone)
+Action buttons (Translate, Fix, Improve) 
+Output: Resulting text block alongside an Explanation section for grammar corrections.
+ប៊ូតុង / មុខងារ និងអត្ថប្រយោជន៍ (Features & Benefits)
+Translate KH <=> EN: Fast, context-aware translations that sound natural in both Khmer and English.
+Fix Grammar: Finds bugs in sentences and fixes them, just like fixing code errors.
+Improve Formal Writing: Refines casual writing into polished, professional prose.
+Tone Adjustment: Dynamically rewrites the input to sound friendly, authoritative, polite, or casual based on the user's request.
+Technology (Tech Stack)
+Frontend - Web 
+HTML + CSS + JavaScript 
+Bootstrap, jQuery 
+Backend / AI 
+Python Django (RestAPI) + Google Gemini API 
+Database 
+SQLite 
