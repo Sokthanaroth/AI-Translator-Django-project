@@ -117,8 +117,12 @@ Text to fix:
             
         return Response({'error': error_msg}, status=500)
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 def get_history(request):
+    if request.method == 'DELETE':
+        TranslationHistory.objects.all().delete()
+        return Response({'success': True})
+
     history = TranslationHistory.objects.all().order_by('-created_at')[:20]  # Get last 20
     data = []
     for item in history:
