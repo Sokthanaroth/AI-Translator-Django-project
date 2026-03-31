@@ -444,7 +444,7 @@
         <div class="header-controls">
             <div class="control-field" id="languageControl">
                 <label for="languageSelect" class="control-label">Language</label>
-                <select id="languageSelect" onchange="updateRecognitionLanguage()">
+                <select id="languageSelect" onchange="handleLanguageChange()">
                     <option value="English">English</option>
                     <option value="Khmer">Khmer</option>
                 </select>
@@ -452,7 +452,7 @@
             
             <div class="control-field d-none" id="toneControl">
                 <label for="toneSelect" class="control-label">Tone</label>
-                <select class="form-select w-auto shadow-sm" id="toneSelect">
+                <select class="form-select w-auto shadow-sm" id="toneSelect" onchange="handleToneChange()">
                     <option value="Friendly">Friendly</option>
                     <option value="Formal">Formal</option>
                     <option value="Professional">Professional</option>
@@ -529,7 +529,7 @@
 <script>
     let currentMode = 'translate'; // default
     let debounceTimer = null;
-    const DEBOUNCE_DELAY = 800; // Wait 800ms after user stops typing
+    const DEBOUNCE_DELAY = 500; // Wait 500ms after user stops typing for faster real-time updates
     
     // Voice Recognition Setup
     let recognition = null;
@@ -640,6 +640,19 @@
         document.getElementById('voiceStatus').style.display = 'none';
     }
     
+    function handleLanguageChange() {
+        updateRecognitionLanguage();
+        if (currentMode === 'translate' && document.getElementById('sourceText').value.trim()) {
+            processText();
+        }
+    }
+
+    function handleToneChange() {
+        if (currentMode === 'tone' && document.getElementById('sourceText').value.trim()) {
+            processText();
+        }
+    }
+
     function updateRecognitionLanguage() {
         const langSelect = document.getElementById('languageSelect').value;
         const voiceBtn = document.getElementById('voiceBtn');
