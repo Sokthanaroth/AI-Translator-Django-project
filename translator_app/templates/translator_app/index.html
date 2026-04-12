@@ -131,13 +131,8 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.12);
         }
-        .header-controls .control-field::after {
-            content: '\25BE';
-            display: inline-block;
-            margin-left: 8px;
-            color: #6c757d;
-            pointer-events: none;
-            font-size: 0.8rem;
+        .header-controls .control-field button::after {
+            display: none;
         }
         .header-controls .control-field select {
             width: auto;
@@ -354,7 +349,7 @@
         }
         .footer-actions {
             position: absolute;
-            top: 440px;
+            bottom: 20px;
             right: 18px;
             display: flex;
             flex-direction: column;
@@ -369,15 +364,18 @@
             z-index: 5;
         }
         .footer-actions button {
-            width: 52px;
-            height: 52px;
+            width: 50px;
+            height: 50px;
         }
         .file-status,
         .file-hint,
         .voice-status {
-            position: static;
-            width: 100%;
-            margin-top: 12px;
+            position: absolute;
+            bottom: 90px;
+            right: 18px;
+            width: auto;
+            max-width: 280px;
+            margin-top: 0;
             border-radius: 18px;
             padding: 10px 14px;
             font-size: 0.88rem;
@@ -385,6 +383,8 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             background: rgba(255,255,255,0.95);
             transition: all 0.2s ease;
+            display: none;
+            z-index: 6;
         }
         .voice-status,
         .file-status {
@@ -397,6 +397,14 @@
             color: #6c757d;
             font-size: 0.82rem;
             font-weight: 500;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: rgba(248, 249, 250, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .footer-actions button {
             min-width: 50px;
@@ -512,36 +520,57 @@
             }
             .footer-actions {
                 position: static;
-                justify-content: flex-start;
-                margin-top: 12px;
+                justify-content: center;
+                margin-top: 15px;
                 flex-direction: row;
-                width: auto;
+                width: 100%;
+                box-shadow: none;
+                background: transparent;
+                border: none;
+                padding: 0;
+                gap: 15px !important;
+            }
+            .footer-actions button {
+                width: 50px;
+                height: 50px;
+                flex-shrink: 0;
             }
             textarea {
                 padding-right: 20px;
+                padding-bottom: 20px;
             }
             .source-pane .voice-btn {
-                width: 46px;
-                height: 46px;
+                width: 55px;
+                height: 55px;
             }
             .voice-status,
             .file-status,
             .file-hint {
                 position: static;
                 width: 100%;
-                margin-top: 10px;
+                margin-top: 12px;
                 left: auto;
                 right: auto;
                 bottom: auto;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 background: rgba(255,255,255,0.95);
-                padding: 10px 14px;
+                padding: 12px 16px;
+                border-radius: 12px;
+                font-size: 0.9rem;
             }
             .file-hint {
                 background: transparent;
                 color: #6c757d;
                 box-shadow: none;
-                padding: 0;
+                padding: 8px 12px;
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+                background: rgba(248, 249, 250, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-size: 0.8rem;
             }
             .file-name-display {
                 max-width: 90%;
@@ -555,6 +584,47 @@
             }
             .sidebar .nav-link.active {
                 transform: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .workspace {
+                padding: 12px 10px;
+            }
+            .header-controls {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .split-pane {
+                gap: 12px;
+            }
+            .pane {
+                min-height: 200px;
+            }
+            .footer-actions {
+                gap: 12px !important;
+                margin-top: 12px;
+            }
+            .footer-actions button {
+                width: 48px;
+                height: 48px;
+            }
+            .source-pane .voice-btn {
+                width: 48px;
+                height: 48px;
+            }
+            .voice-status,
+            .file-status,
+            .file-hint {
+                margin-top: 10px;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
+            .file-name-display {
+                max-width: 95%;
+                font-size: 0.9rem;
+                padding: 10px 20px;
             }
         }
     </style>
@@ -603,11 +673,9 @@
         <!-- Controls -->
         <div class="header-controls">
             <div class="control-field" id="languageControl">
-                <label for="languageSelect" class="control-label">Language</label>
-                <select id="languageSelect" onchange="handleLanguageChange()">
-                    <option value="English">English</option>
-                    <option value="Khmer">Khmer</option>
-                </select>
+                <button class="btn btn-outline-primary rounded-pill px-3" onclick="swapLanguage()" title="Swap Language">
+                    <i class="bi bi-arrow-swap"></i> <span id="languageLabel">English → Khmer</span>
+                </button>
             </div>
             
             <div class="control-field d-none" id="toneControl">
@@ -631,7 +699,7 @@
                 </div>
                 <textarea id="sourceText" class="form-control" placeholder="Type or paste your text here..."></textarea>
                 <div class="footer-actions d-flex gap-2">
-                    <button class="btn btn-outline-secondary rounded-circle" style="width: 50px; height: 50px;" onclick="document.getElementById('fileInput').click()" title="Attach file (.txt, .pdf, .docx)">
+                    <button class="btn btn-outline-secondary rounded-circle" style="width: 50px; height: 50px;" onclick="document.getElementById('fileInput').click()" title="Attach file (.txt, .pdf, .docx, .doc)">
                         <i class="bi bi-paperclip"></i>
                     </button>
                     <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()" title="Click to speak (English)">
@@ -809,25 +877,23 @@
         document.getElementById('voiceStatus').style.display = 'none';
     }
     
-    function handleLanguageChange() {
+    let currentLanguage = 'English';
+
+    function swapLanguage() {
+        currentLanguage = currentLanguage === 'English' ? 'Khmer' : 'English';
+        const direction = currentLanguage === 'English' ? 'Khmer → English' : 'English → Khmer';
+        document.getElementById('languageLabel').textContent = direction;
         updateRecognitionLanguage();
         if (currentMode === 'translate' && document.getElementById('sourceText').value.trim()) {
             processText();
         }
     }
 
-    function handleToneChange() {
-        if (currentMode === 'tone' && document.getElementById('sourceText').value.trim()) {
-            processText();
-        }
-    }
-
     function updateRecognitionLanguage() {
-        const langSelect = document.getElementById('languageSelect').value;
         const voiceBtn = document.getElementById('voiceBtn');
         if (recognition) {
-            if (langSelect === 'Khmer') {
-                recognition.lang = 'km-KH'; // Khmer language code
+            if (currentLanguage === 'Khmer') {
+                recognition.lang = 'km-KH';
                 voiceBtn.title = 'Click to speak (Khmer)';
             } else {
                 recognition.lang = 'en-US'; // English language code
@@ -1084,10 +1150,18 @@
         }
     }
 
+    function clearFileAttachment() {
+        document.getElementById('fileHint').style.display = 'none';
+        document.getElementById('fileHint').innerHTML = '';
+        // Clear the file input
+        document.getElementById('fileInput').value = '';
+    }
+
     function clearSourceText() {
         document.getElementById('sourceText').value = '';
         document.getElementById('targetText').value = '';
         document.getElementById('explanationBox').style.display = 'none';
+        clearFileAttachment();
         if(isRecording) stopRecording();
     }
 
@@ -1170,8 +1244,9 @@
             if (response.ok) {
                 document.getElementById('sourceText').value = data.text;
                 fileStatus.innerHTML = '<i class="bi bi-check-circle text-success"></i> File loaded successfully.';
-                // Update hint to show file attached without exposing the filename
+                // Update hint to show file attached with filename
                 fileHint.style.display = 'block';
+                fileHint.innerHTML = '<i class="bi bi-file-earmark-check text-success"></i> ' + file.name + ' <button class="btn btn-sm btn-outline-danger ms-2 py-0 px-1" onclick="clearFileAttachment()" title="Remove file"><i class="bi bi-x"></i></button>';
                 setTimeout(() => {
                     fileStatus.style.display = 'none';
                 }, 3000);
@@ -1219,7 +1294,6 @@
         indicator.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${indicatorText}`;
         indicator.style.display = 'block';
 
-        const langSelect = document.getElementById('languageSelect').value;
         const toneSelect = document.getElementById('toneSelect').value;
 
         try {
@@ -1232,7 +1306,7 @@
                 body: JSON.stringify({
                     mode: currentMode,
                     text: sourceText,
-                    target_language: langSelect,
+                    target_language: currentLanguage,
                     tone: toneSelect
                 })
             });
