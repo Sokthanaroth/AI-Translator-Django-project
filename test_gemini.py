@@ -1,16 +1,17 @@
 import os
 import sys
-import google.generativeai as genai
+from google import genai
 
 # Fix windows console unicode issues
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Setup your API key here (get one at https://aistudio.google.com/app/apikey)
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDePee1jOVyoPLqNSwofWuTDW3kjSWi6o8")
+# IMPORTANT: Never commit real API keys to version control!
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "YOUR_NEW_API_KEY_HERE")
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
+model_name = 'gemini-2.0-flash'
 
-model = genai.GenerativeModel('gemini-2.5-flash')
 
 def test_translation(text, target_language="English"):
     print(f"Original: {text}")
@@ -18,9 +19,10 @@ def test_translation(text, target_language="English"):
     
     prompt = f"Translate the following text to {target_language}. Just provide the translation and nothing else:\n\n{text}"
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model=model_name, contents=prompt)
     print(f"Translation: {response.text}")
     print("-" * 40)
+
 
 def test_grammar_fix(text):
     print(f"Original: {text}")
@@ -35,9 +37,10 @@ Text to fix:
 {text}
 """
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model=model_name, contents=prompt)
     print(response.text)
     print("-" * 40)
+
 
 if __name__ == "__main__":
     if GEMINI_API_KEY == "YOUR_API_KEY_HERE":

@@ -1,8 +1,5 @@
 import os
-try:
-    import google.generativeai as genai
-except ModuleNotFoundError:
-    genai = None
+from google import genai
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.text import get_valid_filename
@@ -16,16 +13,14 @@ from decouple import config
 
 # Configure Google Gemini
 GOOGLE_API_KEY = config('GOOGLE_API_KEY', default=None)
-MODEL_NAME = 'gemini-flash-latest'
+MODEL_NAME = 'gemini-2.0-flash'
 
 
 def get_gemini_client():
-    if genai is None:
-        raise RuntimeError('google-generativeai is not installed. Install it with: pip install google-generativeai')
     if not GOOGLE_API_KEY:
         raise RuntimeError('GOOGLE_API_KEY environment variable is required for AI requests')
-    genai.configure(api_key=GOOGLE_API_KEY)
-    return genai.GenerativeModel(MODEL_NAME)
+    client = genai.Client(api_key=GOOGLE_API_KEY)
+    return client
 
 def index(request):
     return render(request, 'translator_app/index.html')
@@ -50,7 +45,7 @@ def process_text(request):
         model = get_gemini_client()
         if mode == 'translate':
             prompt = f"Translate the following text to {target_lang}. Just provide the exact translation and nothing else:\n\n{text}"
-            response = model.generate_content(prompt)
+            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
             result_val = response.text.strip()
             
         elif mode == 'grammar':
@@ -64,7 +59,7 @@ Explanation:
 
 Text to fix:
 {text}"""
-            response = model.generate_content(prompt)
+            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
             resp_text = response.text
             try:
                 parts = resp_text.split("Explanation:")
@@ -76,13 +71,13 @@ Text to fix:
             
         elif mode == 'improve':
             prompt = f"Improve the following text to sound highly professional, polite, and well-written. VERY IMPORTANT: Maintain the EXACT SAME language as the original text (e.g. if the input is Khmer, the output must be Khmer). Just provide the improved text:\n\n{text}"
-            response = model.generate_content(prompt)
+            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
             result_val = response.text.strip()
             explanation_val = 'Text has been professionally enhanced.'
             
         elif mode == 'tone':
             prompt = f"Rewrite the following text so that it sounds strictly {tone}. VERY IMPORTANT: Maintain the EXACT SAME language as the original text (e.g. if the input is Khmer, the output must be Khmer). Just provide the rewritten text:\n\n{text}"
-            response = model.generate_content(prompt)
+            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
             result_val = response.text.strip()
             explanation_val = f'Tone adjusted to {tone}.'
             
@@ -155,9 +150,9 @@ def upload_file(request):
     
     uploaded_file = request.FILES['file']
     
-    # Check file size (max 5MB)
-    if uploaded_file.size > 5 * 1024 * 1024:
-        return Response({'error': 'File size exceeds 5MB limit'}, status=400)
+    # Check file size (max 20MB)
+    if uploaded_file.size > 20 * 1024 * 1024:
+        return Response({'error': 'File size exceeds 20MB limit'}, status=400)
     
     # Check file extension
     allowed_extensions = ['.txt', '.doc', '.docx', '.pdf']
@@ -196,9 +191,6 @@ def upload_file(request):
 
         return Response({
             'success': True,
-            'filename': safe_filename,
-            'file_path': file_path,
-            'file_url': file_url,
             'text': content
         })
     except Exception as e:
