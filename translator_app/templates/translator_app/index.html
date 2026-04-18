@@ -881,7 +881,7 @@
 
     function swapLanguage() {
         currentLanguage = currentLanguage === 'English' ? 'Khmer' : 'English';
-        const direction = currentLanguage === 'English' ? 'Khmer → English' : 'Khmer → English';
+        const direction = currentLanguage === 'English' ? 'English → Khmer' : 'Khmer → English';
         document.getElementById('languageLabel').textContent = direction;
         updateRecognitionLanguage();
         if (currentMode === 'translate' && document.getElementById('sourceText').value.trim()) {
@@ -972,6 +972,10 @@
         
         // hide explanation box by default on mode switch
         document.getElementById('explanationBox').style.display = 'none';
+        
+        // Clear source and result text when switching modes
+        document.getElementById('sourceText').value = '';
+        document.getElementById('targetText').value = '';
 
         const indicator = document.getElementById('realtimeIndicator');
         
@@ -1165,7 +1169,7 @@
         if(isRecording) stopRecording();
     }
 
-    function copyResult() {
+    function copyResult(event) {
         const textToCopy = document.getElementById("targetText").value;
         if(textToCopy) {
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -1306,7 +1310,7 @@
                 body: JSON.stringify({
                     mode: currentMode,
                     text: sourceText,
-                    target_language: currentLanguage,
+                    target_language: currentLanguage === 'Khmer' ? 'English' : 'Khmer',
                     tone: toneSelect
                 })
             });

@@ -1,5 +1,5 @@
 import os
-from google import genai
+from groq import Groq
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.text import get_valid_filename
@@ -11,15 +11,15 @@ from PyPDF2 import PdfReader
 from docx import Document
 from decouple import config
 
-# Configure Google Gemini
-GOOGLE_API_KEY = config('GOOGLE_API_KEY', default=None)
-MODEL_NAME = 'gemini-2.0-flash'
+# Configure Groq
+GROQ_API_KEY = config('GROQ_API_KEY', default=None)
+MODEL_NAME = 'llama-3.3-70b-versatile'
 
 
-def get_gemini_client():
-    if not GOOGLE_API_KEY:
-        raise RuntimeError('GOOGLE_API_KEY environment variable is required for AI requests')
-    client = genai.Client(api_key=GOOGLE_API_KEY)
+def get_groq_client():
+    if not GROQ_API_KEY:
+        raise RuntimeError('GROQ_API_KEY environment variable is required for AI requests')
+    client = Groq(api_key=GROQ_API_KEY)
     return client
 
 def index(request):
@@ -39,14 +39,14 @@ def process_text(request):
         explanation_val = ""
         result_val = ""
 
-        if not GOOGLE_API_KEY:
-            return Response({'error': 'AI service unavailable. Set GOOGLE_API_KEY in your environment.'}, status=503)
+        if not GROQ_API_KEY:
+            return Response({'error': 'AI service unavailable. Set GROQ_API_KEY in your environment.'}, status=503)
 
-        model = get_gemini_client()
+        client = get_groq_client()
         if mode == 'translate':
             prompt = f"Translate the following text to {target_lang}. Just provide the exact translation and nothing else:\n\n{text}"
-            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
-            result_val = response.text.strip()
+            response = client.chat.completions.create(model=MODEL_NAME, messages=[{"role": "user", "content": prompt}])
+            result_val = response.choices[0].message.content.strip()
             
         elif mode == 'grammar':
             prompt = f"""You are an expert grammar editor. Fix the following text and explain your corrections. VERY IMPORTANT: You must reply in the exact same language as the input text (if the input is in Khmer, your fixes and explanations MUST be in Khmer). Output your answer EXACTLY in this format:
@@ -59,8 +59,8 @@ Explanation:
 
 Text to fix:
 {text}"""
-            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
-            resp_text = response.text
+            response = client.chat.completions.create(model=MODEL_NAME, messages=[{"role": "user", "content": prompt}])
+            resp_text = response.choices[0].message.content.strip()
             try:
                 parts = resp_text.split("Explanation:")
                 result_val = parts[0].replace("Fixed:", "").strip()
@@ -71,14 +71,14 @@ Text to fix:
             
         elif mode == 'improve':
             prompt = f"Improve the following text to sound highly professional, polite, and well-written. VERY IMPORTANT: Maintain the EXACT SAME language as the original text (e.g. if the input is Khmer, the output must be Khmer). Just provide the improved text:\n\n{text}"
-            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
-            result_val = response.text.strip()
+            response = client.chat.completions.create(model=MODEL_NAME, messages=[{"role": "user", "content": prompt}])
+            result_val = response.choices[0].message.content.strip()
             explanation_val = 'Text has been professionally enhanced.'
             
         elif mode == 'tone':
             prompt = f"Rewrite the following text so that it sounds strictly {tone}. VERY IMPORTANT: Maintain the EXACT SAME language as the original text (e.g. if the input is Khmer, the output must be Khmer). Just provide the rewritten text:\n\n{text}"
-            response = model.models.generate_content(model=MODEL_NAME, contents=prompt)
-            result_val = response.text.strip()
+            response = client.chat.completions.create(model=MODEL_NAME, messages=[{"role": "user", "content": prompt}])
+            result_val = response.choices[0].message.content.strip()
             explanation_val = f'Tone adjusted to {tone}.'
             
         else:
