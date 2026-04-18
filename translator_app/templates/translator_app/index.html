@@ -1335,7 +1335,7 @@
                 
                 const countdownInterval = setInterval(() => {
                     secondsLeft -= 1;
-                    indicator.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Cooling Down... (${secondsLeft}s)`;
+                    indicator.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> System cooldown... (${secondsLeft}s)`;
                     if (secondsLeft <= 0) {
                         clearInterval(countdownInterval);
                         // Automatically re-fire the processText function!
