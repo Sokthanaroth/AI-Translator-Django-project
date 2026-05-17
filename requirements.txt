@@ -1,0 +1,15 @@
+Django==4.2.24
+djangorestframework==3.16.0
+groq==1.1.2
+deep-translator==1.11.4
+PyPDF2==3.0.1
+python-docx==1.2.0
+python-decouple==3.8
+mysqlclient==2.2.7
+SpeechRecognition==3.16.1
+imageio-ffmpeg==0.6.0
+python-telegram-bot==22.7
+
+
+pillow>=10.0.0
+requests>=2.31.0
